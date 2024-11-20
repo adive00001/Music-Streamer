@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Strimply - Music Streaming</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            background-color: #E6E6FA;
+            color: #333;
+            font-family: 'Circular', Arial, sans-serif;
+            margin: 0;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .sidebar {
+            width: 240px;
+            background-color: #D8BFD8;
+            padding: 20px 10px;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid #C3B1E1;
+            transition: background-color 0.3s;
+        }
+
+        .sidebar h2 {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin: 0;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #C3B1E1;
+            color: #333;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            margin-top: 20px;
+        }
+
+        .sidebar ul li {
+            margin: 10px 0;
+            cursor: pointer;
+            padding: 12px 15px;
+            border-radius: 30px;
+            transition: background-color 0.3s, color 0.3s;
+            font-size: 14px;
+            color: #555;
+            display: flex;
+            align-items: center;
+        }
+
+        .sidebar ul li i {
+            margin-right: 10px;
+            font-size: 18px;
+        }
+
+        .sidebar ul li:hover {
+            background-color: #C3B1E1;
+            color: #fff;
+        }
+
+        .sidebar ul li.active {
+            background-color: #9370DB;
+            color: white;
+            font-weight: bold;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 20px 30px;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            background-color: #F0F0FF;
+            transition: opacity 0.3s;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .header input {
+            width: 70%;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 20px;
+            background-color: #D8BFD8;
+            color: #333;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+
+        .header input:focus {
+            outline: none;
+            background-color: #C3B1E1;
+        }
+
+        .playlists {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .playlist {
+            background-color: #D8BFD8;
+            padding: 15px;
+            border-radius: 10px;
+            width: 180px;
+            text-align: center;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+            color: #555;
+            font-size: 14px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+
+        .playlist img {
+            border-radius: 5px;
+            width: 100%;
+            height: auto;
+            margin-bottom: 10px;
+        }
+
+        .playlist:hover {
+            background-color: #C3B1E1;
+            transform: translateY(-2px);
+        }
+
+        .playlist strong {
+            font-size: 16px;
+            color: #333;
+            margin-top: 5px;
+        }
+
+        .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 100px;
+            background-color: #F0F0FF;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            border-top: 1px solid #C3B1E1;
+            box-shadow: 0px -2px 5px rgba(0, 0, 0, 0.5);
+            z-index: 10;
+        }
+
+        .footer-left {
+            display: flex;
+            align-items: center;
+        }
+
+        .footer-left img {
+            width: 60px;
+            height: 60px;
+            margin-right: 15px;
+            border-radius: 5px;
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .footer-left .song-info {
+            display: flex;
+            flex-direction: column;
+            color: #555;
+        }
+
+        .footer-left .song-info strong {
+            font-size: 14px;
+            color: #333;
+        }
+
+        .footer-center {
+            display: flex;
+            align-items: center;
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .footer-center .playback-controls {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .footer-center button {
+            background-color: transparent;
+            border: none;
+            color: #555;
+            cursor: pointer;
+            transition: color 0.3s, transform 0.3s;
+        }
+
+        .footer-center button:hover {
+            color: #9370DB;
+            transform: scale(1.1);
+        }
+
+        .footer-center button i {
+            font-size: 24px;
+        }
+
+        .progress-bar {
+            width: 140%;
+            margin-top: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #555;
+            font-size: 12px;
+        }
+
+        .progress-bar input[type="range"] {
+            width: 100%;
+            margin: 0 15px;
+            -webkit-appearance: none;
+            appearance: none;
+            background-color: #B0A7D6;
+            height: 4px;
+            border-radius: 2px;
+        }
+
+        .progress-bar input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            background-color: #9370DB;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .progress-bar input[type="range"]::-webkit-slider-thumb:hover {
+            background-color: #8A2BE2;
+        }
+
+        .progress-bar span {
+            font-size: 12px;
+            color: #555;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .search-results {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .search-result {
+            background-color: #D8BFD8;
+            padding: 15px;
+            border-radius: 10px;
+            width: 180px;
+            text-align: center;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+            color: #555;
+            font-size: 14px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+
+        .search-result img {
+            border-radius: 5px;
+            width: 100%;
+            height: auto;
+            margin-bottom: 10px;
+        }
+
+        .search-result:hover {
+            background-color: #C3B1E1;
+            transform: translateY(-2px);
+        }
+
+        .search-result strong {
+            font-size: 16px;
+            color: #333;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <h2>Your Library</h2>
+            <ul>
+                <li class="tab-link active" data-tab="home"><i class="fas fa-home"></i>Home</li>
+                <li class="tab-link" data-tab="search"><i class="fas fa-search"></i>Search</li>
+                <li class="tab-link" data-tab="library"><i class="fas fa-music"></i>Your Library</li>
+                <li class="tab-link" data-tab="podcasts"><i class="fas fa-podcast"></i>Podcasts</li>
+                <li class="tab-link" data-tab="liked"><i class="fas fa-heart"></i>Liked Songs</li>
+            </ul>
+        </div>
+        <div class="main-content">
+            <div class="header">
+               
+                <input type="text" id="search-input" placeholder="Search for songs, artists, or albums..." name="search-input">
+                <button id="search-button"><i class="fas fa-search"></i></button>
+            
+                <button id="login-button" style="padding: 10px; border-radius: 20px; background-color: #9370DB; border: none; color: white; font-weight: bold;">Login</button>
+            </div>
+            <div class="tab-content active" id="home">
+                <h1>Home</h1>
+                <div class="playlists">
+                    <div class="playlist">
+                        <img src="https://via.placeholder.com/150" alt="Playlist 1">
+                        <strong>Daily Mix 1</strong>
+                    </div>
+                    <div class="playlist">
+                        <img src="https://via.placeholder.com/150" alt="Playlist 2">
+                        <strong>Daily Mix 2</strong>
+                    </div>
+                    <div class="playlist">
+                        <img src="https://via.placeholder.com/150" alt="Playlist 3">
+                        <strong>Daily Mix 3</strong>
+                    </div>
+                    <div class="playlist">
+                        <img src="https://via.placeholder.com/150" alt="Playlist 4">
+                        <strong>Daily Mix 4</strong>
+                    </div>
+                    <div class="playlist">
+                        <img src="https://via.placeholder.com/150" alt="Playlist 5">
+                        <strong>Daily Mix 5</strong>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-content" id="search">
+                <h1>Search</h1>
+                <div class="search-results" id="search-results">
+                    <!-- Search results will be dynamically added here -->
+                </div>
+            </div>
+            <div class="tab-content" id="library">
+                <h1>Your Library</h1>
+                <p>Your saved songs and playlists will appear here.</p>
+            </div>
+            <div class="tab-content" id="podcasts">
+                <h1>Podcasts</h1>
+                <p>Your podcasts will be listed here.</p>
+            </div>
+            <div class="tab-content" id="liked">
+                <h1>Liked Songs</h1>
+                <p>Your liked songs will be shown here.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <div class="footer-left">
+            <img src="https://via.placeholder.com/60" alt="Album Art" id="current-album-art">
+            <div class="song-info">
+                <strong id="current-song-title">Song Title</strong>
+                <span id="current-artist">Artist Name</span>
+            </div>
+        </div>
+        <div class="footer-center">
+            <div class="playback-controls">
+                <button id="shuffle"><i class="fas fa-random"></i></button>
+                <button id="previous"><i class="fas fa-step-backward"></i></button>
+                <button id="play"><i class="fas fa-play-circle"></i></button>
+                <button id="next"><i class="fas fa-step-forward"></i></button>
+                <button id="repeat"><i class="fas fa-redo"></i></button>
+            </div>
+            <div class="progress-bar">
+                <span id="current-time">0:00</span>
+                <input type="range" id="progress" value="0" min="0" max="100">
+                <span id="duration">3:42</span>
+            </div>
+        </div>
+        <div class="footer-right">
+            <button><i class="fas fa-volume-up"></i></button>
+            <input type="range" id="volume" min="0" max="100" value="50">
+        </div>
+        </div>
+    </div>
+
+    <script>
+        let playing = false;
+        let progressSlider = document.getElementById('progress');
+        let playButton = document.getElementById('play');
+        let currentTime = document.getElementById('current-time');
+        let songDuration = 222;
+
+        playButton.addEventListener('click', function() {
+            playing = !playing;
+            playButton.innerHTML = playing ? '<i class="fas fa-pause-circle"></i>' : '<i class="fas fa-play-circle"></i>';
+        });
+
+        progressSlider.addEventListener('input', function() {
+            let newTime = (this.value / 100) * songDuration;
+            updateCurrentTime(newTime);
+        });
+
+        function updateCurrentTime(timeInSeconds) {
+            let minutes = Math.floor(timeInSeconds / 60);
+            let seconds = Math.floor(timeInSeconds % 60);
+            currentTime.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+        }
+
+        setInterval(() => {
+            if (playing) {
+                let newProgress = parseInt(progressSlider.value) + 1;
+                if (newProgress <= 100) {
+                    progressSlider.value = newProgress;
+                    updateCurrentTime((newProgress / 100) * songDuration);
+                }
+            }
+        }, 1000);
+
+        document.querySelectorAll('.tab-link').forEach((link) => {
+            link.addEventListener('click', function() {
+                document.querySelectorAll('.tab-link').forEach(l => l.classList.remove('active'));
+                link.classList.add('active');
+
+                document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+                const targetTab = link.getAttribute('data-tab');
+                document.getElementById(targetTab).classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>
